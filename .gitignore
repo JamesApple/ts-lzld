@@ -1,0 +1,6 @@
+lib-cov
+coverage
+*.lcov
+.nyc_output
+lib/
+node_modules/
