@@ -1,0 +1,14 @@
+{
+  "//": "This file is auto-generated in 'app.ts'",
+  "lzld": "0.0.0-development",
+  "entries": [
+    {
+      "path": "./GetUser.handler.ts",
+      "meta": {
+        "name": "GetUser",
+        "path": "/users/:id",
+        "method": "get"
+      }
+    }
+  ]
+}
