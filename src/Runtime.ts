@@ -1,3 +1,4 @@
+import path from 'path';
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
@@ -16,13 +17,16 @@ export class Runtime<T extends ConstructorLike, M extends MetadataLike> {
     return this.config.entries as Entry<M>[];
   }
 
-  load({ path }: GeneratedFileData['entries'][number]): T {
-    const maybe = require(path)?.default;
-    if (maybe?.constructor !== this.supertype) {
+  load({ path: relativePath }: GeneratedFileData['entries'][number]): T {
+    const absolutePath = path.resolve(
+      this.opts.absolutePathPrefix,
+      relativePath
+    );
+
+    const maybe = require(absolutePath)?.default;
+    if (!(maybe?.prototype instanceof this.supertype)) {
       throw new Error(
-        `lzld expected ${this.supertype.name} but got ${
-          maybe?.constructor?.name ?? maybe ?? 'undefined'
-        }`
+        `lzld expected ${this.supertype.name} but got ${maybe ?? 'undefined'}`
       );
     }
     return maybe as T;
