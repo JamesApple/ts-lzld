@@ -50,12 +50,7 @@ export class Generator {
           paths.push({
             absolutePath: nextPath,
             result: match,
-            relativePath:
-              '.' +
-              path.resolve(
-                this.opts.localPathPrefix,
-                nextPath.replace(this.opts.absolutePathPrefix, '')
-              ),
+            relativePath: this.getRelativePathToHandler(nextPath),
           });
         }
       });
@@ -63,5 +58,14 @@ export class Generator {
     collectPaths(this.opts.absolutePathPrefix);
 
     return paths;
+  }
+
+  private getRelativePathToHandler(absolute: string) {
+    const filepath = absolute.replace(this.opts.absolutePathPrefix + '/', '');
+
+    const dirname = path.dirname(filepath);
+    const filename = path.parse(filepath).name;
+
+    return path.join(dirname, filename);
   }
 }
