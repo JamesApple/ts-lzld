@@ -1,5 +1,4 @@
-import path from 'path';
-import { resolveEntrypoint } from './helper';
+import { ResolvedEntrypoint, resolveEntrypoint } from './helper';
 import { CompleteEntrypointOptions } from './options';
 import {
   ConstructorLike,
@@ -9,26 +8,24 @@ import {
 } from './types';
 
 export class Runtime<T extends ConstructorLike, M extends MetadataLike> {
-  constructor(private supertype: T, private opts: CompleteEntrypointOptions) {}
+  constructor(private supertype: T, public opts: CompleteEntrypointOptions) {}
 
   get entries(): Entry<M>[] {
     return this.config.entries as Entry<M>[];
   }
 
-  load({ path: relativePath }: GeneratedFileData['entries'][number]): T {
-    const absolutePath = path.resolve(
-      this.opts.absolutePathPrefix,
-      relativePath
-    );
-
-    return resolveEntrypoint(this.supertype, absolutePath);
+  load({
+    path: relativePath,
+  }: GeneratedFileData['entries'][number]): ResolvedEntrypoint<T> {
+    const target = this.opts.searchPath.addRelative(relativePath, 'file');
+    return resolveEntrypoint(this.supertype, target);
   }
 
-  get config(): GeneratedFileData {
-    const config = require(this.opts.absoluteMetadataFilePath);
+  private get config(): GeneratedFileData {
+    const config = require(this.opts.metadataFile.absolute);
     if (config?.lzld == null) {
       throw new Error(
-        `Invalid configuration file at ${this.opts.absoluteMetadataFilePath}`
+        `lzld: invalid metadata file referenced at ${this.opts.metadataFile.absolute} from ${this.opts.sourceFile.absolute}`
       );
     }
     return config;

@@ -1,4 +1,4 @@
-import path from 'path';
+import { AbsolutePath } from './Filepath';
 import { ConstructorLike, MatchedPath, MetadataLike } from './types';
 
 export interface EntrypointOptions<
@@ -58,11 +58,10 @@ export interface CompleteEntrypointOptions {
   match: RegExp;
   getMetadata: (target: ConstructorLike, match: MatchedPath) => MetadataLike;
 
-  sourceFilename: string;
+  sourceFile: AbsolutePath;
 
-  absoluteMetadataFilePath: string;
-  localPathPrefix: string;
-  absolutePathPrefix: string;
+  metadataFile: AbsolutePath;
+  searchPath: AbsolutePath;
 
   generate: boolean;
 }
@@ -70,14 +69,14 @@ export interface CompleteEntrypointOptions {
 export const completeOptions = (
   opts: EntrypointOptions<any, any>
 ): CompleteEntrypointOptions => {
-  const dirname = path.dirname(opts.__filename);
+  const currentFile = AbsolutePath.fromAbsolute(opts.__filename, 'file');
+
   return {
     getMetadata: opts.getMetadata ?? (() => ({})),
     match: opts.match,
-    sourceFilename: path.basename(opts.__filename),
-    localPathPrefix: opts.searchPath ?? '.',
-    absolutePathPrefix: path.resolve(dirname, opts.searchPath ?? ''),
+    sourceFile: currentFile,
+    searchPath: currentFile.addRelative(opts.searchPath ?? '.', 'dir'),
     generate: opts.generate ?? process.env.NODE_ENV === 'development',
-    absoluteMetadataFilePath: path.resolve(dirname, opts.metadataFilepath),
+    metadataFile: currentFile.addRelative(opts.metadataFilepath, 'file'),
   };
 };

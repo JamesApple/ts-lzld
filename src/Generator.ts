@@ -1,9 +1,15 @@
-import { ConstructorLike, GeneratedFileData, MatchedPath } from './types';
+import {
+  ConstructorLike,
+  Entry,
+  GeneratedFileData,
+  MatchedPath,
+  MetadataLike,
+} from './types';
 import fs from 'fs';
 import path from 'path';
-import { version } from '../package.json';
 import { CompleteEntrypointOptions } from './options';
 import { resolveEntrypoint } from './helper';
+import { AbsolutePath } from './Filepath';
 
 export class Generator {
   constructor(
@@ -14,30 +20,30 @@ export class Generator {
   generate(): GeneratedFileData {
     const matches = this.getMatches();
 
-    const entries = matches.map(match => {
+    const entries: Entry<MetadataLike>[] = matches.map(match => {
+      const relative = this.opts.searchPath.getImportablePathTo(match.path);
+      const { name, entry } = resolveEntrypoint(this.supertype, match.path);
       return {
-        path: match.relativePath,
-        meta: this.opts.getMetadata(
-          resolveEntrypoint(this.supertype, match.absolutePath),
-          match
-        ),
+        name,
+        path: relative,
+        meta: this.opts.getMetadata(entry, match),
       };
     });
 
     const fileData: GeneratedFileData = {
-      '//': `This file is auto-generated in '${this.opts.sourceFilename}'`,
-      lzld: version,
+      '//': `This file is auto-generated in '${this.opts.sourceFile.completeFilename}'`,
+      lzld: 'generated',
       entries,
     };
 
     fs.writeFileSync(
-      this.opts.absoluteMetadataFilePath,
+      this.opts.metadataFile.absolute,
       JSON.stringify(fileData, null, 2)
     );
     return fileData;
   }
 
-  getMatches(): MatchedPath[] {
+  private getMatches(): MatchedPath[] {
     const paths: MatchedPath[] = [];
 
     const collectPaths = (dir: string) => {
@@ -51,24 +57,14 @@ export class Generator {
         const match = this.opts.match.exec(nextPath);
         if (match) {
           paths.push({
-            absolutePath: nextPath,
+            path: AbsolutePath.fromAbsolute(nextPath, 'file'),
             result: match,
-            relativePath: this.getRelativePathToHandler(nextPath),
           });
         }
       });
     };
-    collectPaths(this.opts.absolutePathPrefix);
+    collectPaths(this.opts.searchPath.dirname);
 
     return paths;
-  }
-
-  private getRelativePathToHandler(absolute: string) {
-    const filepath = absolute.replace(this.opts.absolutePathPrefix + '/', '');
-
-    const dirname = path.dirname(filepath);
-    const filename = path.parse(filepath).name;
-
-    return path.join(dirname, filename);
   }
 }

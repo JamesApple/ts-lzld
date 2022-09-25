@@ -1,6 +1,6 @@
 import { APIHandler } from '../APIHandler';
 
-export default class Health extends APIHandler {
+export class Health extends APIHandler {
   static http = {
     path: '/health',
     method: 'get',
