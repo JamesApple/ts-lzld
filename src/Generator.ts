@@ -1,11 +1,15 @@
-import { GeneratedFileData, MatchedPath } from './types';
+import { ConstructorLike, GeneratedFileData, MatchedPath } from './types';
 import fs from 'fs';
 import path from 'path';
 import { version } from '../package.json';
 import { CompleteEntrypointOptions } from './options';
+import { resolveEntrypoint } from './helper';
 
 export class Generator {
-  constructor(private opts: CompleteEntrypointOptions) {}
+  constructor(
+    private supertype: ConstructorLike,
+    private opts: CompleteEntrypointOptions
+  ) {}
 
   generate(): GeneratedFileData {
     const matches = this.getMatches();
@@ -14,8 +18,7 @@ export class Generator {
       return {
         path: match.relativePath,
         meta: this.opts.getMetadata(
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          require(match.absolutePath).default,
+          resolveEntrypoint(this.supertype, match.absolutePath),
           match
         ),
       };

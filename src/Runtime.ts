@@ -1,7 +1,5 @@
 import path from 'path';
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
+import { resolveEntrypoint } from './helper';
 import { CompleteEntrypointOptions } from './options';
 import {
   ConstructorLike,
@@ -23,13 +21,7 @@ export class Runtime<T extends ConstructorLike, M extends MetadataLike> {
       relativePath
     );
 
-    const maybe = require(absolutePath)?.default;
-    if (!(maybe?.prototype instanceof this.supertype)) {
-      throw new Error(
-        `lzld expected ${this.supertype.name} but got ${maybe ?? 'undefined'}`
-      );
-    }
-    return maybe as T;
+    return resolveEntrypoint(this.supertype, absolutePath);
   }
 
   get config(): GeneratedFileData {

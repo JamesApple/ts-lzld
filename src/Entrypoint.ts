@@ -7,7 +7,7 @@ export class Entrypoint<T extends ConstructorLike, M extends MetadataLike> {
   static init: Init = (supertype, args) => {
     const options = completeOptions(args);
     if (options.generate) {
-      const generator = new Generator(options);
+      const generator = new Generator(supertype, options);
       generator.generate();
     }
     return new Entrypoint(new Runtime(supertype, options));
