@@ -42,3 +42,12 @@ const isInRequireCache = (path: string): boolean => {
   const absolutePath = require.resolve(path);
   return !!require.cache[absolutePath];
 };
+
+describe('Codegen', function () {
+  it('generates a valid index file for all handlers', function () {
+    const entrypoint = createValidEntrypoint(true);
+
+    entrypoint.codegen('./api/index.ts')`${({ entries }) =>
+      entries.map(({ exportStatement, meta }) => exportStatement(meta.name))}`;
+  });
+});

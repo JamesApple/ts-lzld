@@ -1,9 +1,10 @@
 {
   "//": "This file is auto-generated in 'app.test.ts'",
-  "lzld": "0.0.0-development",
+  "lzld": "generated",
   "entries": [
     {
-      "path": "api/GetUser.handler",
+      "name": "default",
+      "path": "./api/GetUser.handler",
       "meta": {
         "name": "GetUser",
         "path": "/users/:id",
@@ -11,7 +12,8 @@
       }
     },
     {
-      "path": "api/Health.handler",
+      "name": "Health",
+      "path": "./api/Health.handler",
       "meta": {
         "name": "Health",
         "path": "/health",

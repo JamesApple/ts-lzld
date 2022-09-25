@@ -1,5 +1,5 @@
 {
   "file": "./test/setup.ts",
-  "require": "ts-node/register/transpile-only",
+  "require": "ts-node/register",
   "spec": "test/**/*.test.ts"
 }
