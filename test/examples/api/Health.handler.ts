@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/require-await */
 import { APIHandler } from '../APIHandler';
 
 export default class Health extends APIHandler {
