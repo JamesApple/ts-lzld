@@ -1,4 +1,4 @@
-# LZLD (Lazy Load)
+# LZLD (Lazy Load) 🦥
 
 [![npm package][npm-img]][npm-url]
 [![Build Status][build-img]][build-url]
