@@ -17,12 +17,16 @@ export class Runtime<T extends ConstructorLike, M extends MetadataLike> {
   load({
     path: relativePath,
   }: GeneratedFileData['entries'][number]): ResolvedEntrypoint<T> {
-    const target = this.opts.searchPath.addRelative(relativePath, 'file');
-    return resolveEntrypoint(this.supertype, target);
+    const { searchPath } = this.opts;
+
+    const target = searchPath.addRelative(relativePath, 'file');
+    return resolveEntrypoint(this.supertype, target, this.opts.files);
   }
 
   private get config(): GeneratedFileData {
-    const config = require(this.opts.metadataFile.absolute);
+    const { files, metadataFile } = this.opts;
+
+    const config = files.require(metadataFile);
     if (config?.lzld == null) {
       throw new Error(
         `lzld: invalid metadata file referenced at ${this.opts.metadataFile.absolute} from ${this.opts.sourceFile.absolute}`

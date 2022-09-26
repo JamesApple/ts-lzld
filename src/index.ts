@@ -1,5 +1,4 @@
 export { Entrypoint } from './Entrypoint';
-export { Codegen } from './Codegen';
 export {
   MetadataLike,
   GeneratedFileData,
