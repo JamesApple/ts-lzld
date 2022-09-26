@@ -1,5 +1,5 @@
-import fs from 'fs';
 import { AbsolutePath } from './Filepath';
+import { Files } from './Files';
 import { ConstructorLike } from './types';
 
 export interface ResolvedEntrypoint<T extends ConstructorLike> {
@@ -9,9 +9,10 @@ export interface ResolvedEntrypoint<T extends ConstructorLike> {
 
 export const resolveEntrypoint = <T extends ConstructorLike>(
   supertype: T,
-  absolutePath: AbsolutePath
+  absolutePath: AbsolutePath,
+  files: Files
 ): ResolvedEntrypoint<T> => {
-  const resolved = require(absolutePath.absolute);
+  const resolved = files.require(absolutePath);
   const exports = Object.entries(resolved);
 
   const entrypoint = exports.find(([, exported]) => {
@@ -29,11 +30,4 @@ export const resolveEntrypoint = <T extends ConstructorLike>(
     name: entrypoint[0],
     entry: entrypoint[1] as T,
   };
-};
-
-export const createFile = (filepath: AbsolutePath, content: string): void => {
-  if (!fs.existsSync(filepath.dirname)) {
-    fs.mkdirSync(filepath.dirname, { recursive: true });
-  }
-  fs.writeFileSync(filepath.absolute, content);
 };

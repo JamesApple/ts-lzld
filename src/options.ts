@@ -1,4 +1,5 @@
 import { AbsolutePath } from './Filepath';
+import { Files, NodeFiles } from './Files';
 import { ConstructorLike, MatchedPath, MetadataLike } from './types';
 
 export interface EntrypointOptions<
@@ -52,6 +53,10 @@ export interface EntrypointOptions<
    * ```
    */
   generate?: boolean;
+
+  __private?: {
+    files?: Files;
+  };
 }
 
 export interface CompleteEntrypointOptions {
@@ -64,6 +69,8 @@ export interface CompleteEntrypointOptions {
   searchPath: AbsolutePath;
 
   generate: boolean;
+
+  files: Files;
 }
 
 export const completeOptions = (
@@ -78,5 +85,6 @@ export const completeOptions = (
     searchPath: currentFile.addRelative(opts.searchPath ?? '.', 'dir'),
     generate: opts.generate ?? process.env.NODE_ENV === 'development',
     metadataFile: currentFile.addRelative(opts.metadataFilepath, 'file'),
+    files: opts.__private?.files ?? new NodeFiles(),
   };
 };

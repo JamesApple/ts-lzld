@@ -1,10 +1,14 @@
-import fs from 'fs';
 import { AbsolutePath } from './Filepath';
+import { CompleteEntrypointOptions } from './options';
 import { Runtime } from './Runtime';
 import { ConstructorLike, MetadataLike } from './types';
 
 export class Codegen<T extends ConstructorLike, M extends MetadataLike> {
-  constructor(private filepath: AbsolutePath, private runtime: Runtime<T, M>) {}
+  constructor(
+    private filepath: AbsolutePath,
+    private opts: CompleteEntrypointOptions,
+    private runtime: Runtime<T, M>
+  ) {}
 
   template: TemplaterFunction<T, M> = (fragments, ...funcs) => {
     if (!this.shouldGenerate) {
@@ -55,7 +59,7 @@ export class Codegen<T extends ConstructorLike, M extends MetadataLike> {
       ''
     );
 
-    fs.writeFileSync(this.filepath.absolute, data);
+    this.opts.files.createFile(this.filepath, data);
   };
 
   private resolveTemplateString(

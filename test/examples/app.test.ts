@@ -15,7 +15,7 @@ const createValidEntrypoint = (generate: boolean) =>
     }),
   });
 
-describe('a valid entrypoint configuration', () => {
+describe('Example: a valid entrypoint configuration', () => {
   after(() => createValidEntrypoint(true));
 
   it('does not immediately load handlers', function () {

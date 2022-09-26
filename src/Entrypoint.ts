@@ -11,10 +11,12 @@ import { ConstructorLike, LoadableMetadata, MetadataLike } from './types';
 export class Entrypoint<T extends ConstructorLike, M extends MetadataLike> {
   static init: Init = (supertype, args) => {
     const options = completeOptions(args);
+
     if (options.generate) {
       const generator = new Generator(supertype, options);
       generator.generate();
     }
+
     return new Entrypoint(options, new Runtime(supertype, options));
   };
 
@@ -39,6 +41,7 @@ export class Entrypoint<T extends ConstructorLike, M extends MetadataLike> {
   codegen(filepath: string): TemplaterFunction<T, M> {
     return new Codegen(
       this.opts.sourceFile.addRelative(filepath, 'file'),
+      this.opts,
       this.runtime
     ).template;
   }
