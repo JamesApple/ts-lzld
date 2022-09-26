@@ -23,6 +23,10 @@ export class AbsolutePath {
     return this.relativePathTo(importTarget.withoutImportableExtension);
   }
 
+  get type(): 'file' | 'dir' {
+    return this.data.type;
+  }
+
   get dirname(): string {
     if (this.data.type === 'file') {
       return path.dirname(this.absolute);

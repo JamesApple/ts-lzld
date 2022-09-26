@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Entrypoint should generate the metadata file 1`] = `
+Object {
+  "//": "This file is auto-generated in 'index.ts'",
+  "entries": Array [
+    Object {
+      "meta": Object {
+        "name": "red",
+        "type": "red",
+      },
+      "name": "redInstance",
+      "path": "./nested/path/to/red",
+    },
+    Object {
+      "meta": Object {
+        "name": "blue",
+        "type": "blue",
+      },
+      "name": "default",
+      "path": "./different/path/to/blue",
+    },
+  ],
+  "lzld": "generated",
+}
+`;

@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Codegen should not fail if generate is false on load 1`] = `
+"
+# Import Statements
+import blue from './project/different/path/to/blue';
+import { RedInstance as red } from './project/nested/path/to/red';
+
+# Export Statements
+export { default as blue } from './project/different/path/to/blue';
+export { RedInstance as red } from './project/nested/path/to/red';
+
+# Metadata
+type: blue name: blue
+type: red name: red
+    "
+`;

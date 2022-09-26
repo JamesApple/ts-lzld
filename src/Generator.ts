@@ -5,11 +5,8 @@ import {
   MatchedPath,
   MetadataLike,
 } from './types';
-import fs from 'fs';
-import path from 'path';
 import { CompleteEntrypointOptions } from './options';
 import { resolveEntrypoint } from './helper';
-import { AbsolutePath } from './Filepath';
 
 export class Generator {
   constructor(
@@ -17,18 +14,10 @@ export class Generator {
     private opts: CompleteEntrypointOptions
   ) {}
 
-  generate(): GeneratedFileData {
-    const matches = this.getMatches();
+  generate(): void {
+    const { files } = this.opts;
 
-    const entries: Entry<MetadataLike>[] = matches.map(match => {
-      const relative = this.opts.searchPath.getImportablePathTo(match.path);
-      const { name, entry } = resolveEntrypoint(this.supertype, match.path);
-      return {
-        name,
-        path: relative,
-        meta: this.opts.getMetadata(entry, match),
-      };
-    });
+    const entries = this.getEntries();
 
     const fileData: GeneratedFileData = {
       '//': `This file is auto-generated in '${this.opts.sourceFile.completeFilename}'`,
@@ -36,34 +25,42 @@ export class Generator {
       entries,
     };
 
-    fs.writeFileSync(
-      this.opts.metadataFile.absolute,
-      JSON.stringify(fileData, null, 2)
-    );
-    return fileData;
+    files.createFile(this.opts.metadataFile, JSON.stringify(fileData, null, 2));
+  }
+
+  private getEntries(): Entry<MetadataLike>[] {
+    const { files, searchPath, getMetadata } = this.opts;
+    const matches = this.getMatches();
+
+    return matches.map(match => {
+      const relative = searchPath.getImportablePathTo(match.path);
+      const { name, entry } = resolveEntrypoint(
+        this.supertype,
+        match.path,
+        files
+      );
+      return {
+        name,
+        path: relative,
+        meta: getMetadata(entry, match),
+      };
+    });
   }
 
   private getMatches(): MatchedPath[] {
     const paths: MatchedPath[] = [];
+    const { match: matcher, searchPath, files } = this.opts;
 
-    const collectPaths = (dir: string) => {
-      fs.readdirSync(dir).forEach(file => {
-        const nextPath = path.resolve(dir, file);
-        const stat = fs.statSync(nextPath);
+    files.recurseDirectory(searchPath, path => {
+      if (path.type === 'file') {
+        const relativePath = searchPath.relativePathTo(path);
+        const result = matcher.exec(relativePath);
 
-        if (stat.isDirectory()) return collectPaths(nextPath);
-        if (!stat.isFile()) return;
-
-        const match = this.opts.match.exec(nextPath);
-        if (match) {
-          paths.push({
-            path: AbsolutePath.fromAbsolute(nextPath, 'file'),
-            result: match,
-          });
+        if (result) {
+          paths.push({ path, result });
         }
-      });
-    };
-    collectPaths(this.opts.searchPath.dirname);
+      }
+    });
 
     return paths;
   }
