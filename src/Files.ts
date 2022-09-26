@@ -26,8 +26,15 @@ export class NodeFiles implements Files {
     if (!fs.existsSync(filepath.dirname)) {
       fs.mkdirSync(filepath.dirname, { recursive: true });
     }
+    if (fs.existsSync(filepath.absolute)) {
+      if (fs.readFileSync(filepath.absolute, 'utf8') === content) {
+        return;
+      }
+    }
 
-    fs.writeFileSync(filepath.absolute, content);
+    fs.writeFileSync(filepath.absolute, content, {
+      encoding: 'utf8',
+    });
   }
 
   recurseDirectory(
