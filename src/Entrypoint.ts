@@ -25,6 +25,12 @@ export class Entrypoint<T extends ConstructorLike, M extends MetadataLike> {
     private runtime: Runtime<T, M>
   ) {}
 
+  findAll(matcher: (meta: M) => boolean): T[] {
+    return this.runtime.entries
+      .filter(entry => matcher(entry.meta))
+      .map(entry => this.runtime.load(entry).entry);
+  }
+
   find(matcher: (meta: M) => boolean): T | undefined {
     const entry = this.runtime.entries.find(entry => matcher(entry.meta));
     if (entry) {
